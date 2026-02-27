@@ -135,10 +135,9 @@ function App() {
         </div>
       </nav>
 
-      {/* Multi-View Content Orchestrator */}
       <main className="relative z-10 h-full w-full pt-16">
         {view === 'landing' && (
-          <div className="h-full w-full flex flex-col lg:flex-row items-center justify-between px-8 lg:px-24">
+          <div className="h-[calc(100vh-64px)] w-full flex flex-col lg:flex-row items-center justify-center lg:justify-between px-8 lg:px-24 py-8 gap-12">
             <div className="flex-1 flex flex-col justify-center max-w-2xl">
               <div className="animate-fade-in">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6 backdrop-blur-md">

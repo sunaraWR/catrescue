@@ -21,10 +21,11 @@ api.interceptors.request.use(
 );
 
 export const authAPI = {
-    register: (username, password) => api.post('/users/register', { username, password }),
+    register: (username, email, password) => api.post('/users/register', { username, email, password }),
     login: (username, password) => api.post('/users/login', { username, password }),
     getProfile: (id) => api.get(`/users/profile/${id}`),
     updateProfile: (id, data) => api.put(`/users/profile/${id}`, data),
+    changePassword: (id, currentPassword, newPassword) => api.put(`/users/profile/${id}/password`, { currentPassword, newPassword }),
 };
 
 export const highscoresAPI = {

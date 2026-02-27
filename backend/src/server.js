@@ -26,12 +26,19 @@ const initDB = async () => {
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(255) UNIQUE NOT NULL,
+                email VARCHAR(255) UNIQUE,
                 password VARCHAR(255) NOT NULL,
                 avatar VARCHAR(50) DEFAULT '🐈',
                 missions_count INT DEFAULT 0,
                 avg_time VARCHAR(20) DEFAULT '0:00'
             )
         `);
+        // Migration: Add email column if it doesn't exist
+        try {
+            await db.query('ALTER TABLE users ADD COLUMN email VARCHAR(255) UNIQUE AFTER username');
+        } catch (e) {
+            // Column likely already exists
+        }
         await db.query(`
             CREATE TABLE IF NOT EXISTS highscores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
