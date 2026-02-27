@@ -1,8 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import useSound from 'use-sound';
 
 const API_URL = 'https://marcconrad.com/uob/heart/api.php?out=json';
 
-export default function Game({ difficulty, onGameEnd }) {
+const SFX = {
+    correct: 'https://assets.mixkit.co/sfx/preview/mixkit-positive-vibe-click-1131.mp3',
+    wrong: 'https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3',
+    win: 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3',
+    lose: 'https://assets.mixkit.co/sfx/preview/mixkit-game-over-dark-orchestra-633.mp3'
+};
+
+export default function Game({ difficulty, onGameEnd, soundEnabled }) {
+    // Sound Effects Direct Trigger
+    const playSound = (url, volume = 0.5) => {
+        if (!soundEnabled) return;
+        const audio = new Audio(url);
+        audio.volume = volume;
+        audio.play().catch(e => console.log("SFX blocked:", e));
+    };
+
     // Game Configuration
     const MAX_LIVES = 7;
     const LEVELS = 6;
@@ -73,9 +89,11 @@ export default function Game({ difficulty, onGameEnd }) {
     }, [timeLeft, gameOver, gameWon, loading]);
 
     const handleWrong = () => {
+        playSound(SFX.wrong);
         if (lives <= 1) {
             setLives(0);
             setGameOver(true);
+            playSound(SFX.lose, 0.6);
             setMessage("Game Over. The maze claims another...");
         } else {
             setLives(lives - 1);
@@ -85,6 +103,7 @@ export default function Game({ difficulty, onGameEnd }) {
     };
 
     const handleCorrect = () => {
+        playSound(SFX.correct);
         const puzzlesInThisLevel = LEVEL_CONFIG[level];
         if (puzzleIndex < puzzlesInThisLevel) {
             setPuzzleIndex(puzzleIndex + 1);
@@ -98,6 +117,7 @@ export default function Game({ difficulty, onGameEnd }) {
                 fetchPuzzle();
             } else {
                 setGameWon(true);
+                playSound(SFX.win, 0.6);
                 setMessage("MISSION COMPLETE! The cat is safe! 🎉");
             }
         }

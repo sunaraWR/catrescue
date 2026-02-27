@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useSound from 'use-sound';
 import AuthCard from './components/AuthCard';
 import Home from './components/Home';
 import MainMenu from './components/MainMenu';
@@ -10,24 +11,47 @@ import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
 import { highscoresAPI } from './services/api';
 
+// Reliable direct MP3 link
+const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
 function App() {
-  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions', 'game', 'highscores', 'profile'
+  const [view, setView] = useState('landing');
   const [difficulty, setDifficulty] = useState('medium');
   const [user, setUser] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const audioRef = useRef(null);
+
+  // Background Music Logic using standard HTML5 Audio
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.2;
+      if (audioUnlocked && soundEnabled && view !== 'landing' && view !== 'game') {
+        audioRef.current.play().catch(e => console.log("BGM Play blocked:", e));
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [view, soundEnabled, audioUnlocked]);
 
   // Load user session on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('cat_rescue_user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
-      setView('home');
     }
   }, []);
+
+  const handleStartMission = () => {
+    setAudioUnlocked(true);
+    setView('home');
+  };
 
   const handleLogin = (userData, token) => {
     setUser(userData);
     localStorage.setItem('cat_rescue_user', JSON.stringify(userData));
     localStorage.setItem('cat_rescue_token', token);
+    setAudioUnlocked(true);
     setView('home');
   };
 
@@ -35,6 +59,7 @@ function App() {
     setUser(null);
     localStorage.removeItem('cat_rescue_user');
     localStorage.removeItem('cat_rescue_token');
+    setAudioUnlocked(false);
     setView('landing');
   };
 
@@ -59,7 +84,10 @@ function App() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden text-slate-200">
+    <div className="relative h-screen w-screen overflow-hidden text-slate-200" onClick={() => !audioUnlocked && setAudioUnlocked(true)}>
+      {/* Hidden Global Audio Element */}
+      <audio ref={audioRef} src={BGM_URL} loop />
+
       {/* Immersive Background Layers */}
       <div
         className="web-background"
@@ -69,13 +97,21 @@ function App() {
 
       {/* Top Bar - Persistent Gaming Style */}
       <nav className="absolute top-0 left-0 w-full h-16 bg-black/60 backdrop-blur-md border-b border-white/5 z-50 flex items-center justify-between px-8">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView(user ? 'home' : 'landing')}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => user && setView('home')}>
           <img src={logo} alt="Mini Logo" className="w-8 h-8 animate-pulse" />
           <span className="text-sm font-black uppercase tracking-[0.2em] text-white">
             Cat<span className="text-indigo-400">Rescue</span> Maze
           </span>
         </div>
         <div className="flex gap-6 items-center">
+          {user && (
+            <div className="flex items-center gap-4 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Audio Status</span>
+              <span className={audioUnlocked ? "text-emerald-400 text-[10px]" : "text-rose-500 text-[10px]"}>
+                {audioUnlocked ? "● SYNCED" : "○ OFFLINE"}
+              </span>
+            </div>
+          )}
           {!user ? (
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Awaiting Identity...</span>
           ) : (
@@ -117,10 +153,19 @@ function App() {
                   The ultimate math puzzle adventure. <br />
                   Become the hero they deserve.
                 </p>
+
+                {user && (
+                  <button
+                    onClick={handleStartMission}
+                    className="shine-button px-10 py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl animate-bounce"
+                  >
+                    Continue Mission: {user.username}
+                  </button>
+                )}
               </div>
             </div>
             <div className="flex-shrink-0 w-full lg:w-auto flex items-center justify-center">
-              <AuthCard onLogin={handleLogin} />
+              {!user && <AuthCard onLogin={handleLogin} />}
             </div>
           </div>
         )}
@@ -137,6 +182,8 @@ function App() {
             onShowHighscores={() => setView('highscores')}
             onShowProfile={() => setView('profile')}
             username={user?.username}
+            soundOn={soundEnabled}
+            setSoundOn={setSoundEnabled}
           />
         )}
 
@@ -151,6 +198,7 @@ function App() {
           <Game
             difficulty={difficulty}
             onGameEnd={handleGameEnd}
+            soundEnabled={soundEnabled}
           />
         )}
 
