@@ -2,11 +2,12 @@ import { useState } from 'react';
 import AuthCard from './components/AuthCard';
 import Home from './components/Home';
 import MainMenu from './components/MainMenu';
+import HowToPlay from './components/HowToPlay';
 import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
 
 function App() {
-  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu'
+  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions'
 
   return (
     <div className="relative h-screen w-screen overflow-hidden text-slate-200">
@@ -74,7 +75,14 @@ function App() {
         )}
 
         {view === 'menu' && (
-          <MainMenu />
+          <MainMenu onPlay={() => setView('instructions')} />
+        )}
+
+        {view === 'instructions' && (
+          <HowToPlay
+            onBack={() => setView('menu')}
+            onStart={() => alert('Rescue Started!')}
+          />
         )}
       </main>
     </div>

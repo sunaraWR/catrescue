@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function MainMenu() {
+export default function MainMenu({ onPlay }) {
     const [difficulty, setDifficulty] = useState('medium');
     const [soundOn, setSoundOn] = useState(true);
 
@@ -31,8 +31,8 @@ export default function MainMenu() {
                                 key={level}
                                 onClick={() => setDifficulty(level)}
                                 className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${difficulty === level
-                                        ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]'
-                                        : 'text-slate-500 hover:text-slate-300'
+                                    ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]'
+                                    : 'text-slate-500 hover:text-slate-300'
                                     }`}
                             >
                                 {level}
@@ -42,7 +42,10 @@ export default function MainMenu() {
                 </div>
 
                 {/* Primary Action */}
-                <button className="shine-button w-full py-6 rounded-2xl text-xl font-black uppercase tracking-[0.3em] shadow-[0_10px_30px_rgba(37,99,235,0.3)] hover:scale-[1.02] active:scale-95 transition-transform">
+                <button
+                    onClick={onPlay}
+                    className="shine-button w-full py-6 rounded-2xl text-xl font-black uppercase tracking-[0.3em] shadow-[0_10px_30px_rgba(37,99,235,0.3)] hover:scale-[1.02] active:scale-95 transition-transform"
+                >
                     Play Mission
                 </button>
 
@@ -62,8 +65,8 @@ export default function MainMenu() {
                     <button
                         onClick={() => setSoundOn(!soundOn)}
                         className={`px-4 py-2 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${soundOn
-                                ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5'
-                                : 'border-slate-700 text-slate-600 bg-transparent'
+                            ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5'
+                            : 'border-slate-700 text-slate-600 bg-transparent'
                             }`}
                     >
                         Sound: {soundOn ? 'ON' : 'OFF'}
