@@ -1,18 +1,23 @@
 import { useState } from 'react';
 
-export default function AuthCard() {
+export default function AuthCard({ onLogin }) {
     const [activeTab, setActiveTab] = useState('login');
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (onLogin) onLogin();
+    };
+
     return (
-        <div className="w-full max-w-[400px] mx-auto">
+        <div className="w-full max-w-[400px] mx-auto animate-fade-in">
             <div className="clean-card overflow-hidden">
                 {/* Tab Header */}
                 <div className="flex border-b border-white/10 bg-white/5">
                     <button
                         onClick={() => setActiveTab('login')}
                         className={`flex-1 py-4 text-sm font-medium transition-colors ${activeTab === 'login'
-                                ? 'text-white border-b-2 border-indigo-500'
-                                : 'text-slate-400 hover:text-slate-200'
+                            ? 'text-white border-b-2 border-indigo-500'
+                            : 'text-slate-400 hover:text-slate-200'
                             }`}
                     >
                         Sign In
@@ -20,8 +25,8 @@ export default function AuthCard() {
                     <button
                         onClick={() => setActiveTab('signup')}
                         className={`flex-1 py-4 text-sm font-medium transition-colors ${activeTab === 'signup'
-                                ? 'text-white border-b-2 border-indigo-500'
-                                : 'text-slate-400 hover:text-slate-200'
+                            ? 'text-white border-b-2 border-indigo-500'
+                            : 'text-slate-400 hover:text-slate-200'
                             }`}
                     >
                         Register
@@ -40,13 +45,14 @@ export default function AuthCard() {
                         </p>
                     </div>
 
-                    <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                    <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="space-y-1.5">
                             <label className="text-sm font-medium text-slate-300 ml-0.5">Email Address</label>
                             <input
                                 type="email"
                                 placeholder="name@example.com"
                                 className="form-input"
+                                required
                             />
                         </div>
 
@@ -56,6 +62,7 @@ export default function AuthCard() {
                                 type="password"
                                 placeholder="Enter your password"
                                 className="form-input"
+                                required
                             />
                         </div>
 
@@ -66,11 +73,12 @@ export default function AuthCard() {
                                     type="password"
                                     placeholder="Repeat your password"
                                     className="form-input"
+                                    required
                                 />
                             </div>
                         )}
 
-                        <button className="primary-button w-full mt-2">
+                        <button type="submit" className="primary-button w-full mt-2">
                             {activeTab === 'login' ? 'Sign In' : 'Get Started'}
                         </button>
                     </form>
