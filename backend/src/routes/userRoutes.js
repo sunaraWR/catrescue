@@ -14,7 +14,9 @@ router.post('/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await db.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword]);
+        const avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
+
+        await db.query('INSERT INTO users (username, email, password, avatar) VALUES (?, ?, ?, ?)', [username, email, hashedPassword, avatar]);
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (err) {

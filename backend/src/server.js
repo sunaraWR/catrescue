@@ -28,7 +28,7 @@ const initDB = async () => {
                 username VARCHAR(255) UNIQUE NOT NULL,
                 email VARCHAR(255) UNIQUE,
                 password VARCHAR(255) NOT NULL,
-                avatar VARCHAR(50) DEFAULT '🐈',
+                avatar VARCHAR(255) DEFAULT 'https://api.dicebear.com/7.x/bottts/svg?seed=agent',
                 missions_count INT DEFAULT 0,
                 avg_time VARCHAR(20) DEFAULT '0:00'
             )

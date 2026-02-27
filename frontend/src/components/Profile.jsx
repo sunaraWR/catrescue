@@ -4,7 +4,7 @@ import { authAPI } from '../services/api';
 export default function Profile({ user, onUpdate, onBack }) {
     const [agentName, setAgentName] = useState(user?.username || '');
     const [email, setEmail] = useState(user?.email || '');
-    const [avatar, setAvatar] = useState(user?.avatar || '🐈');
+    const [avatar, setAvatar] = useState(user?.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=agent');
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -57,6 +57,11 @@ export default function Profile({ user, onUpdate, onBack }) {
         }
     };
 
+    const randomizeAvatar = () => {
+        const seed = Math.random().toString(36).substring(7);
+        setAvatar(`https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`);
+    };
+
     return (
         <div className="flex flex-col h-full w-full animate-fade-in p-8 space-y-8 overflow-y-auto hide-scrollbar">
             {/* Header */}
@@ -69,8 +74,12 @@ export default function Profile({ user, onUpdate, onBack }) {
                 {/* Main Identity Card */}
                 <div className="clean-card p-10 flex flex-col md:flex-row items-center gap-10 bg-indigo-500/5 border-indigo-500/20">
                     <div className="relative group">
-                        <div className="w-32 h-32 rounded-[2rem] bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center text-6xl shadow-2xl group-hover:scale-105 transition-transform cursor-pointer" title="Switch Avatar">
-                            {avatar}
+                        <div className="w-32 h-32 rounded-[2rem] bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 transition-transform cursor-pointer" title="Switch Avatar">
+                            {avatar.startsWith('http') ? (
+                                <img src={avatar} alt="Agent Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-6xl">{avatar}</span>
+                            )}
                         </div>
                         <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-emerald-500 border-4 border-slate-950 flex items-center justify-center text-xs shadow-lg">
                             ✓
@@ -136,17 +145,15 @@ export default function Profile({ user, onUpdate, onBack }) {
 
                         <div className="space-y-3">
                             <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Identity Icon</label>
-                            <div className="flex gap-3">
-                                {['🐈', '🐱', '🦁', '🐯'].map(icon => (
-                                    <button
-                                        key={icon}
-                                        type="button"
-                                        onClick={() => setAvatar(icon)}
-                                        className={`w-12 h-12 rounded-lg bg-white/5 border flex items-center justify-center transition-all text-xl ${avatar === icon ? 'border-indigo-500 bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'border-white/10 hover:border-white/20'}`}
-                                    >
-                                        {icon}
-                                    </button>
-                                ))}
+                            <div className="flex flex-col gap-3">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider opacity-60">DiceBear Bottts Generator</span>
+                                <button
+                                    type="button"
+                                    onClick={randomizeAvatar}
+                                    className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/5 text-[9px] font-black uppercase tracking-widest text-indigo-300 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <span className="text-sm">🎲</span> Randomize Identity
+                                </button>
                             </div>
                         </div>
                     </div>

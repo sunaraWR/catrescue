@@ -118,12 +118,16 @@ function App() {
             <div className="flex items-center gap-4">
               <div
                 onClick={() => setView('profile')}
-                className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center cursor-pointer hover:bg-indigo-500/40 transition-all hover:scale-110 active:scale-95 group"
+                className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center cursor-pointer hover:bg-indigo-500/40 transition-all hover:scale-110 active:scale-95 group overflow-hidden"
                 title="View Profile"
               >
-                <span className="text-xs font-bold text-indigo-300 group-hover:text-white transition-colors">
-                  {user.avatar || 'CR'}
-                </span>
+                {user.avatar && user.avatar.startsWith('http') ? (
+                  <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs font-bold text-indigo-300 group-hover:text-white transition-colors">
+                    {user.avatar || 'CR'}
+                  </span>
+                )}
               </div>
               <button
                 onClick={handleLogout}
