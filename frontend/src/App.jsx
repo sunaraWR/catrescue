@@ -73,7 +73,8 @@ function App() {
         await highscoresAPI.save({
           username: user.username,
           level: stats.level,
-          total_time: stats.totalTime
+          total_time: stats.totalTime,
+          difficulty: difficulty
         });
       } catch (err) {
         console.error('Failed to save highscore:', err);

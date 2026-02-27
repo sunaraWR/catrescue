@@ -29,7 +29,7 @@ export const authAPI = {
 };
 
 export const highscoresAPI = {
-    getTop: () => api.get('/highscores'),
+    getTop: (difficulty) => api.get('/highscores', { params: { difficulty } }),
     save: (data) => api.post('/highscores', data),
 };
 

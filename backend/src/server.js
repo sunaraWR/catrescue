@@ -45,9 +45,16 @@ const initDB = async () => {
                 username VARCHAR(255) NOT NULL,
                 level INT NOT NULL,
                 total_time INT NOT NULL,
+                difficulty VARCHAR(20) DEFAULT 'medium',
                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        // Migration: Add difficulty to highscores if it doesn't exist
+        try {
+            await db.query('ALTER TABLE highscores ADD COLUMN difficulty VARCHAR(20) DEFAULT "medium" AFTER total_time');
+        } catch (e) {
+            // Column likely already exists
+        }
         console.log('Database tables initialized');
     } catch (err) {
         console.error('Database initialization error:', err.message);
