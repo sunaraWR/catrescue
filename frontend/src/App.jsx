@@ -8,7 +8,7 @@ import Highscores from './components/Highscores';
 import Profile from './components/Profile';
 import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
-import { highscoresAPI } from './services/api';
+import { highscoresAPI, authAPI } from './services/api';
 
 // Reliable direct MP3 link
 const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
@@ -70,14 +70,25 @@ function App() {
   const handleGameEnd = async (stats) => {
     if (user && stats?.won) {
       try {
+        // Save highscore if it was a win
         await highscoresAPI.save({
           username: user.username,
           level: stats.level,
           total_time: stats.totalTime,
           difficulty: difficulty
         });
+
+        // Update user stats (missions and avg time)
+        const response = await authAPI.updateStats(user.id, stats.totalTime);
+        const updatedUser = {
+          ...user,
+          missions_count: response.data.missions_count,
+          avg_time: response.data.avg_time
+        };
+        handleUpdateUser(updatedUser);
+
       } catch (err) {
-        console.error('Failed to save highscore:', err);
+        console.error('Failed to update stats or highscore:', err);
       }
     }
     setView('menu');

@@ -83,4 +83,33 @@ router.put('/profile/:id/password', async (req, res) => {
     }
 });
 
+// Update Stats (Missions and Avg Time)
+router.put('/profile/:id/stats', async (req, res) => {
+    const { timeTaken } = req.body; // in seconds
+    try {
+        const [users] = await db.query('SELECT missions_count, total_time_seconds FROM users WHERE id = ?', [req.params.id]);
+        if (users.length === 0) return res.status(404).json({ message: 'User not found' });
+
+        const userData = users[0];
+        const newMissionsCount = (userData.missions_count || 0) + 1;
+        const newTotalTimeSeconds = (userData.total_time_seconds || 0) + parseInt(timeTaken);
+        const avgSeconds = Math.round(newTotalTimeSeconds / newMissionsCount);
+
+        const minutes = Math.floor(avgSeconds / 60);
+        const seconds = avgSeconds % 60;
+        const newAvgTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        await db.query('UPDATE users SET missions_count = ?, total_time_seconds = ?, avg_time = ? WHERE id = ?',
+            [newMissionsCount, newTotalTimeSeconds, newAvgTime, req.params.id]);
+
+        res.json({
+            missions_count: newMissionsCount,
+            avg_time: newAvgTime,
+            total_time_seconds: newTotalTimeSeconds
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

@@ -26,6 +26,7 @@ export const authAPI = {
     getProfile: (id) => api.get(`/users/profile/${id}`),
     updateProfile: (id, data) => api.put(`/users/profile/${id}`, data),
     changePassword: (id, currentPassword, newPassword) => api.put(`/users/profile/${id}/password`, { currentPassword, newPassword }),
+    updateStats: (id, timeTaken) => api.put(`/users/profile/${id}/stats`, { timeTaken }),
 };
 
 export const highscoresAPI = {

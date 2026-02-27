@@ -30,15 +30,17 @@ const initDB = async () => {
                 password VARCHAR(255) NOT NULL,
                 avatar VARCHAR(255) DEFAULT 'https://api.dicebear.com/7.x/bottts/svg?seed=agent',
                 missions_count INT DEFAULT 0,
-                avg_time VARCHAR(20) DEFAULT '0:00'
+                avg_time VARCHAR(20) DEFAULT '0:00',
+                total_time_seconds INT DEFAULT 0
             )
         `);
-        // Migration: Add email column if it doesn't exist
+        // Migration: Add columns if they don't exist
         try {
             await db.query('ALTER TABLE users ADD COLUMN email VARCHAR(255) UNIQUE AFTER username');
-        } catch (e) {
-            // Column likely already exists
-        }
+        } catch (e) { }
+        try {
+            await db.query('ALTER TABLE users ADD COLUMN total_time_seconds INT DEFAULT 0 AFTER avg_time');
+        } catch (e) { }
         await db.query(`
             CREATE TABLE IF NOT EXISTS highscores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
