@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
-export default function Profile({ onBack }) {
-    const [agentName, setAgentName] = useState('CatLover_01');
+export default function Profile({ user, onUpdate, onBack }) {
+    const [agentName, setAgentName] = useState(user?.username || '');
+    const [avatar, setAvatar] = useState(user?.avatar || '🐈');
     const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleUpdate = (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
-        setSuccessMessage('Identity updated successfully!');
-        setTimeout(() => setSuccessMessage(''), 3000);
+        setLoading(true);
+        setSuccessMessage('');
+        try {
+            await authAPI.updateProfile(user.id, { username: agentName, avatar });
+            if (onUpdate) onUpdate({ ...user, username: agentName, avatar });
+            setSuccessMessage('Identity updated successfully!');
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (err) {
+            console.error('Failed to update profile:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -22,8 +35,8 @@ export default function Profile({ onBack }) {
                 {/* Main Identity Card */}
                 <div className="clean-card p-10 flex flex-col md:flex-row items-center gap-10 bg-indigo-500/5 border-indigo-500/20">
                     <div className="relative group">
-                        <div className="w-32 h-32 rounded-[2rem] bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center text-6xl shadow-2xl group-hover:scale-105 transition-transform">
-                            🐈
+                        <div className="w-32 h-32 rounded-[2rem] bg-indigo-500/20 border-2 border-indigo-500/40 flex items-center justify-center text-6xl shadow-2xl group-hover:scale-105 transition-transform cursor-pointer" title="Switch Avatar">
+                            {avatar}
                         </div>
                         <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-emerald-500 border-4 border-slate-950 flex items-center justify-center text-xs shadow-lg">
                             ✓
@@ -33,16 +46,18 @@ export default function Profile({ onBack }) {
                     <div className="flex-1 space-y-4 text-center md:text-left">
                         <div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Security Clearance</span>
-                            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Senior Rescuer</h2>
+                            <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+                                {user?.missions_count > 20 ? 'Senior Rescuer' : user?.missions_count > 5 ? 'Elite Agent' : 'Field Operative'}
+                            </h2>
                         </div>
                         <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                             <div className="bg-black/40 px-4 py-2 rounded-xl border border-white/5">
                                 <span className="block text-[8px] font-black text-indigo-400 uppercase">Missions</span>
-                                <span className="font-bold text-white">42</span>
+                                <span className="font-bold text-white">{user?.missions_count || 0}</span>
                             </div>
                             <div className="bg-black/40 px-4 py-2 rounded-xl border border-white/5">
                                 <span className="block text-[8px] font-black text-indigo-400 uppercase">Avg Time</span>
-                                <span className="font-bold text-white">3:45</span>
+                                <span className="font-bold text-white">{user?.avg_time || '0:00'}</span>
                             </div>
                         </div>
                     </div>
@@ -62,10 +77,18 @@ export default function Profile({ onBack }) {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Notification Systems</label>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Identity Icon</label>
                             <div className="flex gap-4">
-                                <button type="button" className="flex-1 bg-indigo-500 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg">Email Alert ON</button>
-                                <button type="button" className="flex-1 bg-white/5 border border-white/10 text-slate-400 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:text-white transition-all">Mobile Alert OFF</button>
+                                {['🐈', '🐱', '🦁', '🐯'].map(icon => (
+                                    <button
+                                        key={icon}
+                                        type="button"
+                                        onClick={() => setAvatar(icon)}
+                                        className={`w-12 h-12 rounded-lg bg-white/5 border flex items-center justify-center transition-all ${avatar === icon ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 hover:border-white/20'}`}
+                                    >
+                                        {icon}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -73,9 +96,10 @@ export default function Profile({ onBack }) {
                     <div className="pt-4 space-y-4">
                         <button
                             type="submit"
-                            className="shine-button w-full py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl"
+                            disabled={loading}
+                            className="shine-button w-full py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl disabled:opacity-50"
                         >
-                            Update Identity
+                            {loading ? 'Synchronizing...' : 'Update Identity'}
                         </button>
 
                         {successMessage && (

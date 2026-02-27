@@ -1,11 +1,31 @@
 import { useState } from 'react';
+import { authAPI } from '../services/api';
 
 export default function AuthCard({ onLogin }) {
     const [activeTab, setActiveTab] = useState('login');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (onLogin) onLogin();
+        setError('');
+        setLoading(true);
+        try {
+            if (activeTab === 'login') {
+                const res = await authAPI.login(username, password);
+                if (onLogin) onLogin(res.data.user, res.data.token);
+            } else {
+                await authAPI.register(username, password);
+                setActiveTab('login');
+                setError('Registration successful! Please sign in.');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Something went wrong');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -45,13 +65,21 @@ export default function AuthCard({ onLogin }) {
                         </p>
                     </div>
 
+                    {error && (
+                        <div className={`mb-4 p-3 rounded text-xs font-bold text-center ${error.includes('successful') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                            {error}
+                        </div>
+                    )}
+
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-slate-300 ml-0.5">Email Address</label>
+                            <label className="text-sm font-medium text-slate-300 ml-0.5">Agent Alias (Username)</label>
                             <input
-                                type="email"
-                                placeholder="name@example.com"
+                                type="text"
+                                placeholder="@username"
                                 className="form-input"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 required
                             />
                         </div>
@@ -62,30 +90,27 @@ export default function AuthCard({ onLogin }) {
                                 type="password"
                                 placeholder="Enter your password"
                                 className="form-input"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </div>
 
-                        {activeTab === 'signup' && (
-                            <div className="space-y-1.5 animate-fade-in">
-                                <label className="text-sm font-medium text-slate-300 ml-0.5">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    placeholder="Repeat your password"
-                                    className="form-input"
-                                    required
-                                />
-                            </div>
-                        )}
-
-                        <button type="submit" className="primary-button w-full mt-2">
-                            {activeTab === 'login' ? 'Sign In' : 'Get Started'}
+                        <button
+                            type="submit"
+                            className="primary-button w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loading}
+                        >
+                            {loading ? 'Processing...' : (activeTab === 'login' ? 'Sign In' : 'Get Started')}
                         </button>
                     </form>
 
                     <div className="mt-8 text-center">
                         <button
-                            onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')}
+                            onClick={() => {
+                                setActiveTab(activeTab === 'login' ? 'signup' : 'login');
+                                setError('');
+                            }}
                             className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
                         >
                             {activeTab === 'login'

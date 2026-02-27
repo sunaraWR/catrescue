@@ -1,11 +1,29 @@
-export default function Highscores({ onBack }) {
-    const scores = [
-        { rank: 1, name: 'Agent_Whiskers', level: 6, time: '02:45', date: '2024-02-27' },
-        { rank: 2, name: 'CatLover_01', level: 6, time: '03:12', date: '2024-02-27' },
-        { rank: 3, name: 'MeowMaster', level: 6, time: '03:45', date: '2024-02-26' },
-        { rank: 4, name: 'ShadowPaws', level: 5, time: '04:20', date: '2024-02-25' },
-        { rank: 5, name: 'PawsomeHero', level: 4, time: '05:10', date: '2024-02-27' },
-    ];
+import { useState, useEffect } from 'react';
+import { highscoresAPI } from '../services/api';
+
+export default function Highscores({ user, onBack }) {
+    const [scores, setScores] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchScores = async () => {
+            try {
+                const res = await highscoresAPI.getTop();
+                setScores(res.data);
+            } catch (err) {
+                console.error('Failed to fetch highscores:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchScores();
+    }, []);
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     return (
         <div className="flex flex-col h-full w-full animate-fade-in p-8 space-y-8">
@@ -25,29 +43,39 @@ export default function Highscores({ onBack }) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto hide-scrollbar">
-                    {scores.map((score) => (
-                        <div
-                            key={score.rank}
-                            className={`grid grid-cols-4 p-5 border-b border-white/5 items-center transition-colors hover:bg-white/5 ${score.name === 'CatLover_01' ? 'bg-indigo-500/5' : ''
-                                }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-black ${score.rank === 1 ? 'bg-amber-400 text-black' :
-                                        score.rank === 2 ? 'bg-slate-300 text-black' :
-                                            score.rank === 3 ? 'bg-amber-700 text-white' :
-                                                'bg-white/5 text-slate-400'
-                                    }`}>
-                                    {score.rank}
-                                </span>
-                            </div>
-                            <div className="font-bold text-white tracking-wide">
-                                {score.name}
-                                {score.name === 'CatLover_01' && <span className="ml-2 text-[8px] px-1.5 py-0.5 rounded bg-indigo-500 text-white uppercase italic">You</span>}
-                            </div>
-                            <div className="text-center font-black text-indigo-400">L{score.level}</div>
-                            <div className="text-right font-black text-white tabular-nums">{score.time}</div>
+                    {loading ? (
+                        <div className="h-full w-full flex items-center justify-center text-slate-500 font-bold uppercase tracking-widest animate-pulse">
+                            Accessing Secure Data...
                         </div>
-                    ))}
+                    ) : scores.length === 0 ? (
+                        <div className="h-full w-full flex items-center justify-center text-slate-500 font-bold uppercase tracking-widest">
+                            No Missions Recorded Yet
+                        </div>
+                    ) : (
+                        scores.map((score, index) => (
+                            <div
+                                key={index}
+                                className={`grid grid-cols-4 p-5 border-b border-white/5 items-center transition-colors hover:bg-white/5 ${score.username === user?.username ? 'bg-indigo-500/5' : ''
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-black ${index === 0 ? 'bg-amber-400 text-black' :
+                                        index === 1 ? 'bg-slate-300 text-black' :
+                                            index === 2 ? 'bg-amber-700 text-white' :
+                                                'bg-white/5 text-slate-400'
+                                        }`}>
+                                        {index + 1}
+                                    </span>
+                                </div>
+                                <div className="font-bold text-white tracking-wide">
+                                    {score.username}
+                                    {score.username === user?.username && <span className="ml-2 text-[8px] px-1.5 py-0.5 rounded bg-indigo-500 text-white uppercase italic">You</span>}
+                                </div>
+                                <div className="text-center font-black text-indigo-400">L{score.level}</div>
+                                <div className="text-right font-black text-white tabular-nums">{formatTime(score.total_time)}</div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 

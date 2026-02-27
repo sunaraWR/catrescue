@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthCard from './components/AuthCard';
 import Home from './components/Home';
 import MainMenu from './components/MainMenu';
@@ -8,10 +8,55 @@ import Highscores from './components/Highscores';
 import Profile from './components/Profile';
 import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
+import { highscoresAPI } from './services/api';
 
 function App() {
   const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions', 'game', 'highscores', 'profile'
   const [difficulty, setDifficulty] = useState('medium');
+  const [user, setUser] = useState(null);
+
+  // Load user session on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('cat_rescue_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setView('home');
+    }
+  }, []);
+
+  const handleLogin = (userData, token) => {
+    setUser(userData);
+    localStorage.setItem('cat_rescue_user', JSON.stringify(userData));
+    localStorage.setItem('cat_rescue_token', token);
+    setView('home');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('cat_rescue_user');
+    localStorage.removeItem('cat_rescue_token');
+    setView('landing');
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('cat_rescue_user', JSON.stringify(updatedUser));
+  };
+
+  const handleGameEnd = async (stats) => {
+    if (user && stats?.won) {
+      try {
+        await highscoresAPI.save({
+          username: user.username,
+          level: stats.level,
+          total_time: stats.totalTime
+        });
+      } catch (err) {
+        console.error('Failed to save highscore:', err);
+      }
+    }
+    setView('menu');
+  };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden text-slate-200">
@@ -24,14 +69,14 @@ function App() {
 
       {/* Top Bar - Persistent Gaming Style */}
       <nav className="absolute top-0 left-0 w-full h-16 bg-black/60 backdrop-blur-md border-b border-white/5 z-50 flex items-center justify-between px-8">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('landing')}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView(user ? 'home' : 'landing')}>
           <img src={logo} alt="Mini Logo" className="w-8 h-8 animate-pulse" />
           <span className="text-sm font-black uppercase tracking-[0.2em] text-white">
             Cat<span className="text-indigo-400">Rescue</span> Maze
           </span>
         </div>
         <div className="flex gap-6 items-center">
-          {view === 'landing' ? (
+          {!user ? (
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Awaiting Identity...</span>
           ) : (
             <div className="flex items-center gap-4">
@@ -40,10 +85,12 @@ function App() {
                 className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center cursor-pointer hover:bg-indigo-500/40 transition-all hover:scale-110 active:scale-95 group"
                 title="View Profile"
               >
-                <span className="text-xs font-bold text-indigo-300 group-hover:text-white transition-colors">CR</span>
+                <span className="text-xs font-bold text-indigo-300 group-hover:text-white transition-colors">
+                  {user.avatar || 'CR'}
+                </span>
               </div>
               <button
-                onClick={() => setView('landing')}
+                onClick={handleLogout}
                 className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest"
               >
                 Logout
@@ -73,7 +120,7 @@ function App() {
               </div>
             </div>
             <div className="flex-shrink-0 w-full lg:w-auto flex items-center justify-center">
-              <AuthCard onLogin={() => setView('home')} />
+              <AuthCard onLogin={handleLogin} />
             </div>
           </div>
         )}
@@ -89,6 +136,7 @@ function App() {
             onDifficultyChange={setDifficulty}
             onShowHighscores={() => setView('highscores')}
             onShowProfile={() => setView('profile')}
+            username={user?.username}
           />
         )}
 
@@ -102,16 +150,16 @@ function App() {
         {view === 'game' && (
           <Game
             difficulty={difficulty}
-            onGameEnd={() => setView('menu')}
+            onGameEnd={handleGameEnd}
           />
         )}
 
         {view === 'highscores' && (
-          <Highscores onBack={() => setView('menu')} />
+          <Highscores user={user} onBack={() => setView('menu')} />
         )}
 
         {view === 'profile' && (
-          <Profile onBack={() => setView('menu')} />
+          <Profile user={user} onUpdate={handleUpdateUser} onBack={() => setView('menu')} />
         )}
       </main>
     </div>

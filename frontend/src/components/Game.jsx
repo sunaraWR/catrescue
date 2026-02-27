@@ -144,7 +144,7 @@ export default function Game({ difficulty, onGameEnd }) {
                         </div>
                     </div>
                     <button
-                        onClick={onGameEnd}
+                        onClick={() => onGameEnd({ won: gameWon, level, totalTime })}
                         className="shine-button w-full py-5 rounded-2xl text-lg font-black uppercase tracking-[0.2em]"
                     >
                         Return to Menu
