@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function MainMenu({ onPlay, difficulty, onDifficultyChange }) {
+export default function MainMenu({ onPlay, difficulty, onDifficultyChange, onShowHighscores, onShowProfile }) {
     const [soundOn, setSoundOn] = useState(true);
 
     return (
@@ -50,10 +50,16 @@ export default function MainMenu({ onPlay, difficulty, onDifficultyChange }) {
 
                 {/* Secondary Actions */}
                 <div className="grid grid-cols-2 gap-4">
-                    <button className="py-4 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+                    <button
+                        onClick={onShowHighscores}
+                        className="py-4 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                    >
                         Highscores
                     </button>
-                    <button className="py-4 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+                    <button
+                        onClick={onShowProfile}
+                        className="py-4 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                    >
                         Profile Update
                     </button>
                 </div>

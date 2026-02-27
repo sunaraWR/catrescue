@@ -4,11 +4,13 @@ import Home from './components/Home';
 import MainMenu from './components/MainMenu';
 import HowToPlay from './components/HowToPlay';
 import Game from './components/Game';
+import Highscores from './components/Highscores';
+import Profile from './components/Profile';
 import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
 
 function App() {
-  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions', 'game'
+  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions', 'game', 'highscores', 'profile'
   const [difficulty, setDifficulty] = useState('medium');
 
   return (
@@ -33,8 +35,12 @@ function App() {
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Awaiting Identity...</span>
           ) : (
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center">
-                <span className="text-xs font-bold text-indigo-300">CR</span>
+              <div
+                onClick={() => setView('profile')}
+                className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center cursor-pointer hover:bg-indigo-500/40 transition-all hover:scale-110 active:scale-95 group"
+                title="View Profile"
+              >
+                <span className="text-xs font-bold text-indigo-300 group-hover:text-white transition-colors">CR</span>
               </div>
               <button
                 onClick={() => setView('landing')}
@@ -81,6 +87,8 @@ function App() {
             onPlay={() => setView('instructions')}
             difficulty={difficulty}
             onDifficultyChange={setDifficulty}
+            onShowHighscores={() => setView('highscores')}
+            onShowProfile={() => setView('profile')}
           />
         )}
 
@@ -97,10 +105,17 @@ function App() {
             onGameEnd={() => setView('menu')}
           />
         )}
+
+        {view === 'highscores' && (
+          <Highscores onBack={() => setView('menu')} />
+        )}
+
+        {view === 'profile' && (
+          <Profile onBack={() => setView('menu')} />
+        )}
       </main>
     </div>
   );
 }
 
 export default App;
-
