@@ -1,6 +1,6 @@
 import logo from '../assets/cat.png';
 
-export default function Home() {
+export default function Home({ onEnterMaze }) {
     return (
         <div className="relative h-full w-full flex flex-col items-center justify-center animate-fade-in">
             {/* Immersive Center Content */}
@@ -31,7 +31,10 @@ export default function Home() {
 
                 {/* Action Area */}
                 <div className="pt-10">
-                    <button className="shine-button px-12 py-5 rounded-2xl text-xl font-black uppercase tracking-[0.2em] transform transition-all active:scale-95 group">
+                    <button
+                        onClick={onEnterMaze}
+                        className="shine-button px-12 py-5 rounded-2xl text-xl font-black uppercase tracking-[0.2em] transform transition-all active:scale-95 group"
+                    >
                         <span className="relative z-10">Enter the Maze</span>
                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
@@ -39,7 +42,7 @@ export default function Home() {
 
             </div>
 
-            
+
         </div>
     );
 }
