@@ -3,11 +3,13 @@ import AuthCard from './components/AuthCard';
 import Home from './components/Home';
 import MainMenu from './components/MainMenu';
 import HowToPlay from './components/HowToPlay';
+import Game from './components/Game';
 import bgImage from './assets/bg.png';
 import logo from './assets/logo.png';
 
 function App() {
-  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions'
+  const [view, setView] = useState('landing'); // 'landing', 'home', 'menu', 'instructions', 'game'
+  const [difficulty, setDifficulty] = useState('medium');
 
   return (
     <div className="relative h-screen w-screen overflow-hidden text-slate-200">
@@ -75,13 +77,24 @@ function App() {
         )}
 
         {view === 'menu' && (
-          <MainMenu onPlay={() => setView('instructions')} />
+          <MainMenu
+            onPlay={() => setView('instructions')}
+            difficulty={difficulty}
+            onDifficultyChange={setDifficulty}
+          />
         )}
 
         {view === 'instructions' && (
           <HowToPlay
             onBack={() => setView('menu')}
-            onStart={() => alert('Rescue Started!')}
+            onStart={() => setView('game')}
+          />
+        )}
+
+        {view === 'game' && (
+          <Game
+            difficulty={difficulty}
+            onGameEnd={() => setView('menu')}
           />
         )}
       </main>

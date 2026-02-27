@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-export default function MainMenu({ onPlay }) {
-    const [difficulty, setDifficulty] = useState('medium');
+export default function MainMenu({ onPlay, difficulty, onDifficultyChange }) {
     const [soundOn, setSoundOn] = useState(true);
 
     return (
@@ -29,10 +28,10 @@ export default function MainMenu({ onPlay }) {
                         {['easy', 'medium', 'hard'].map((level) => (
                             <button
                                 key={level}
-                                onClick={() => setDifficulty(level)}
+                                onClick={() => onDifficultyChange(level)}
                                 className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${difficulty === level
-                                    ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]'
-                                    : 'text-slate-500 hover:text-slate-300'
+                                        ? 'bg-indigo-500 text-white shadow-[0_0_20px_rgba(99,102,241,0.4)]'
+                                        : 'text-slate-500 hover:text-slate-300'
                                     }`}
                             >
                                 {level}
@@ -65,8 +64,8 @@ export default function MainMenu({ onPlay }) {
                     <button
                         onClick={() => setSoundOn(!soundOn)}
                         className={`px-4 py-2 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${soundOn
-                            ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5'
-                            : 'border-slate-700 text-slate-600 bg-transparent'
+                                ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5'
+                                : 'border-slate-700 text-slate-600 bg-transparent'
                             }`}
                     >
                         Sound: {soundOn ? 'ON' : 'OFF'}
