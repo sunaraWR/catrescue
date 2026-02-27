@@ -60,15 +60,6 @@ export default function MainMenu({ onPlay, difficulty, onDifficultyChange, onSho
                     >
                         Profile Update
                     </button>
-                    <button
-                        onClick={() => {
-                            const audio = new Audio('https://www.soundjay.com/buttons/button-3.mp3');
-                            audio.play().catch(e => console.error('Audio test failed:', e));
-                        }}
-                        className="col-span-2 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/40 text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400 hover:bg-indigo-500/20 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
-                    >
-                        <span>🔊</span> Test Audio System
-                    </button>
                 </div>
 
                 {/* Sound Toggle */}

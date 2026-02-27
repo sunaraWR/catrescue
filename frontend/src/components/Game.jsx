@@ -6,6 +6,7 @@ const API_URL = 'https://marcconrad.com/uob/heart/api.php?out=json';
 const SFX = {
     correct: 'https://assets.mixkit.co/sfx/preview/mixkit-positive-vibe-click-1131.mp3',
     wrong: 'https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3',
+    life_lost: 'https://www.myinstants.com/media/sounds/cat-meow.mp3', // Happy meow for catch? No, let's find a better one.
     win: 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3',
     lose: 'https://assets.mixkit.co/sfx/preview/mixkit-game-over-dark-orchestra-633.mp3'
 };
@@ -89,14 +90,14 @@ export default function Game({ difficulty, onGameEnd, soundEnabled }) {
     }, [timeLeft, gameOver, gameWon, loading]);
 
     const handleWrong = () => {
-        playSound(SFX.wrong);
         if (lives <= 1) {
             setLives(0);
             setGameOver(true);
-            playSound(SFX.lose, 0.6);
+            playSound(SFX.lose, 0.8);
             setMessage("Game Over. The maze claims another...");
         } else {
             setLives(lives - 1);
+            playSound(SFX.life_lost, 0.6);
             setMessage("Wrong answer! 😿 The path shifted.");
             fetchPuzzle();
         }

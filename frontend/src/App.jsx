@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import useSound from 'use-sound';
 import AuthCard from './components/AuthCard';
 import Home from './components/Home';
 import MainMenu from './components/MainMenu';
